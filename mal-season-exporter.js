@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Extract Anime Titles and Dates with Custom Date Format
+// @name         Extract Anime Titles and Dates with Header
 // @namespace    http://tampermonkey.net/
-// @version      1.2
-// @description  Mengambil judul anime dan tanggal mulai dari halaman dengan format tanggal [YYMMDD]
+// @version      1.3
+// @description  Mengambil judul anime, tanggal mulai, dan header dari halaman
 // @author       Haroro
 // @match        https://myanimelist.net/*
 // @grant        none
@@ -13,28 +13,37 @@
 
     // Tunggu hingga halaman selesai dimuat
     window.addEventListener('load', () => {
-        // Ambil semua elemen dengan class "js-anime-category-producer" yang mengandung anime
-        const animeElements = document.querySelectorAll('.js-anime-category-producer');
+        // Ambil semua elemen anime dengan class "js-seasonal-anime-list"
+        const animeSections = document.querySelectorAll('.js-seasonal-anime-list');
 
         // Array untuk menyimpan hasil
         const animeData = [];
 
-        // Loop untuk mengambil data dari setiap anime
-        animeElements.forEach(element => {
-            // Ambil judul anime
-            const title = element.querySelector('.link-title')?.textContent.trim();
-            // Ambil tanggal mulai (dari span dengan class js-start_date)
-            const startDate = element.querySelector('.js-start_date')?.textContent.trim();
+        // Loop untuk setiap "js-seasonal-anime-list" (section per kategori)
+        animeSections.forEach(section => {
+            // Ambil header kategori dari elemen "anime-header"
+            const header = section.querySelector('.anime-header')?.textContent.trim();
 
-            if (title && startDate) {
-                // Format tanggal ke [YYMMDD]
-                const formattedDate = formatDate(startDate);
-                animeData.push(`[${formattedDate}] ${title}`);
-            }
+            // Ambil semua anime dalam kategori ini
+            const animeElements = section.querySelectorAll('.js-anime-category-producer');
+
+            animeElements.forEach(element => {
+                // Ambil judul anime
+                const title = element.querySelector('.link-title')?.textContent.trim();
+                // Ambil tanggal mulai (dari span dengan class js-start_date)
+                const startDate = element.querySelector('.js-start_date')?.textContent.trim();
+
+                if (title && startDate) {
+                    // Format tanggal ke [YYMMDD]
+                    const formattedDate = formatDate(startDate);
+                    // Gabungkan dengan header kategori
+                    animeData.push(`[${formattedDate}] ${title} 【${header}】`);
+                }
+            });
         });
 
         // Tampilkan hasil di konsol
-        console.log('Judul Anime dan Tanggal Mulai:', animeData);
+        console.log('Judul Anime, Tanggal, dan Kategori:', animeData);
 
         // Menampilkan hasil di halaman (optional)
         const resultDiv = document.createElement('div');
