@@ -31,17 +31,24 @@ The downloaded `anime_list.txt` file will contain:
 
 ## Installation
 
-1. **Install Tampermonkey**  
-   Download and install the [Tampermonkey extension](https://www.tampermonkey.net/) for your browser.
+### 1. Install Tampermonkey  
+Download and install the [Tampermonkey extension](https://www.tampermonkey.net/) for your browser.
 
-2. **Add the Script**  
-   - Open the **Tampermonkey Dashboard**.
-   - Click **Create a New Script**.
-   - Replace the default content with the script from this repository.
-   - Save the script.
+### 2. Add the Script  
 
-3. **Visit MyAnimeList**  
-   Go to any seasonal anime page on [MyAnimeList](https://myanimelist.net/anime/season).
+#### Option 1: Manually Add the Script  
+1. Open the **Tampermonkey Dashboard** in your browser.
+2. Click **Create a New Script**.
+3. Replace the default content with the script from this repository.
+4. Save the script.
+
+#### Option 2: Install from GreasyFork  
+1. Visit the script page on [GreasyFork](https://greasyfork.org/en/scripts/517881-save-anime-list-as-txt).  
+2. Click the **"Install this script"** button.  
+3. Tampermonkey will prompt you to confirm installation. Click **Install**.
+
+### 3. Visit MyAnimeList  
+Go to any seasonal anime page on [MyAnimeList](https://myanimelist.net/anime/season) to use the script.
 
 ## How to Use
 
