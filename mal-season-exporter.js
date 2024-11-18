@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Extract Anime Titles and Dates
+// @name         Extract Anime Titles and Dates with Custom Date Format
 // @namespace    http://tampermonkey.net/
-// @version      1.1
-// @description  Mengambil judul anime dan tanggal mulai dari halaman
+// @version      1.2
+// @description  Mengambil judul anime dan tanggal mulai dari halaman dengan format tanggal [YYMMDD]
 // @author       Haroro
 // @match        https://myanimelist.net/*
 // @grant        none
@@ -27,7 +27,7 @@
             const startDate = element.querySelector('.js-start_date')?.textContent.trim();
 
             if (title && startDate) {
-                // Format dan simpan data
+                // Format tanggal ke [YYMMDD]
                 const formattedDate = formatDate(startDate);
                 animeData.push(`[${formattedDate}] ${title}`);
             }
@@ -49,15 +49,11 @@
         document.body.appendChild(resultDiv);
     });
 
-    // Fungsi untuk mengubah tanggal dalam format yyyyMMdd menjadi format yang lebih baik
+    // Fungsi untuk mengubah tanggal dalam format yyyyMMdd menjadi [YYMMDD]
     function formatDate(dateString) {
-        const year = dateString.substring(0, 4);
-        const month = dateString.substring(4, 6);
-        const day = dateString.substring(6, 8);
-        const monthNames = [
-            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-        ];
-        return `${monthNames[parseInt(month, 10) - 1]} ${parseInt(day, 10)}, ${year}`;
+        const year = dateString.substring(2, 4); // Ambil 2 digit terakhir dari tahun
+        const month = dateString.substring(4, 6); // Ambil bulan
+        const day = dateString.substring(6, 8); // Ambil hari
+        return `${year}${month}${day}`;
     }
 })();
