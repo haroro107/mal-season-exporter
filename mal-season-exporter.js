@@ -1,68 +1,88 @@
 // ==UserScript==
-// @name         Extract Anime Titles and Dates with Header
+// @name         Save Anime List as TXT
 // @namespace    http://tampermonkey.net/
-// @version      1.3
-// @description  Mengambil judul anime, tanggal mulai, dan header dari halaman
+// @version      1.4
+// @description  Tambahkan tombol untuk menyimpan daftar anime ke file TXT
 // @author       Haroro
 // @match        https://myanimelist.net/*
 // @grant        none
 // ==/UserScript==
 
-(function() {
+(function () {
     'use strict';
 
-    // Tunggu hingga halaman selesai dimuat
-    window.addEventListener('load', () => {
-        // Ambil semua elemen anime dengan class "js-seasonal-anime-list"
-        const animeSections = document.querySelectorAll('.js-seasonal-anime-list');
+    // Fungsi untuk membuat tombol "Simpan List"
+    function addSaveButton() {
+        // Cari elemen menu navigasi
+        const navMenu = document.querySelector('.horiznav_nav ul');
+        if (!navMenu) return;
 
-        // Array untuk menyimpan hasil
+        // Buat elemen <li> untuk tombol
+        const saveButtonLi = document.createElement('li');
+
+        // Buat elemen <a> untuk tombol
+        const saveButton = document.createElement('a');
+        saveButton.href = "#";
+        saveButton.textContent = "Simpan List";
+        saveButton.className = "navtab"; // Tambahkan kelas yang sama untuk konsistensi
+        saveButton.style.cursor = "pointer";
+
+        // Tambahkan event listener untuk menyimpan data saat tombol diklik
+        saveButton.addEventListener('click', () => {
+            const animeData = gatherAnimeData();
+            if (animeData.length === 0) {
+                alert("Tidak ada data yang ditemukan!");
+                return;
+            }
+            downloadAsTextFile("anime_list.txt", animeData.join('\n'));
+        });
+
+        // Tambahkan tombol ke dalam elemen <li> dan masukkan ke menu navigasi
+        saveButtonLi.appendChild(saveButton);
+        navMenu.appendChild(saveButtonLi);
+    }
+
+    // Fungsi untuk mengumpulkan data anime
+    function gatherAnimeData() {
+        const animeSections = document.querySelectorAll('.js-seasonal-anime-list');
         const animeData = [];
 
-        // Loop untuk setiap "js-seasonal-anime-list" (section per kategori)
         animeSections.forEach(section => {
-            // Ambil header kategori dari elemen "anime-header"
             const header = section.querySelector('.anime-header')?.textContent.trim();
-
-            // Ambil semua anime dalam kategori ini
             const animeElements = section.querySelectorAll('.js-anime-category-producer');
 
             animeElements.forEach(element => {
-                // Ambil judul anime
                 const title = element.querySelector('.link-title')?.textContent.trim();
-                // Ambil tanggal mulai (dari span dengan class js-start_date)
                 const startDate = element.querySelector('.js-start_date')?.textContent.trim();
 
                 if (title && startDate) {
-                    // Format tanggal ke [YYMMDD]
                     const formattedDate = formatDate(startDate);
-                    // Gabungkan dengan header kategori
                     animeData.push(`[${formattedDate}] ${title} 【${header}】`);
                 }
             });
         });
 
-        // Tampilkan hasil di konsol
-        console.log('Judul Anime, Tanggal, dan Kategori:', animeData);
+        return animeData;
+    }
 
-        // Menampilkan hasil di halaman (optional)
-        const resultDiv = document.createElement('div');
-        resultDiv.style.position = 'fixed';
-        resultDiv.style.bottom = '10px';
-        resultDiv.style.right = '10px';
-        resultDiv.style.backgroundColor = 'white';
-        resultDiv.style.border = '1px solid black';
-        resultDiv.style.padding = '10px';
-        resultDiv.style.zIndex = '10000';
-        resultDiv.textContent = `Hasil: ${animeData.join(', ')}`;
-        document.body.appendChild(resultDiv);
-    });
-
-    // Fungsi untuk mengubah tanggal dalam format yyyyMMdd menjadi [YYMMDD]
+    // Fungsi untuk memformat tanggal ke [YYMMDD]
     function formatDate(dateString) {
-        const year = dateString.substring(2, 4); // Ambil 2 digit terakhir dari tahun
-        const month = dateString.substring(4, 6); // Ambil bulan
-        const day = dateString.substring(6, 8); // Ambil hari
+        const year = dateString.substring(2, 4);
+        const month = dateString.substring(4, 6);
+        const day = dateString.substring(6, 8);
         return `${year}${month}${day}`;
     }
+
+    // Fungsi untuk mengunduh data sebagai file TXT
+    function downloadAsTextFile(filename, content) {
+        const blob = new Blob([content], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+
+    // Tambahkan tombol saat halaman selesai dimuat
+    window.addEventListener('load', addSaveButton);
 })();
